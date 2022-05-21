@@ -4,8 +4,12 @@ using UnityEngine.UI;
 public class AudioManager : MonoBehaviour
 {
     [SerializeField] private Toggle toggle;
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private Slider slider;
 
     private string volume = "volume";
+    private float musicVolume = 1f;
+
 
     private void Awake()
     {
@@ -15,13 +19,14 @@ public class AudioManager : MonoBehaviour
     void Update()
     {
         MuteAudio();
+        audioSource.volume = musicVolume;
     }
 
     private void SaveDataMute()
     {
         if (PlayerPrefs.HasKey(volume))
         {
-            if (PlayerPrefs.GetInt(volume) == 1)
+            if (PlayerPrefs.GetFloat(volume) > 0.0f)
             {
                 toggle.isOn = true;
             }
@@ -29,6 +34,7 @@ public class AudioManager : MonoBehaviour
             {
                 toggle.isOn = false;
             }
+            slider.value = PlayerPrefs.GetFloat(volume, musicVolume);
         }
     }
 
@@ -36,14 +42,19 @@ public class AudioManager : MonoBehaviour
     {
         if (toggle.isOn)
         {
-            AudioListener.volume = 1;
-            PlayerPrefs.SetInt(volume, 1);
+            AudioListener.volume = audioSource.volume;
+            PlayerPrefs.SetFloat(volume, audioSource.volume);
         }
         else
         {
             AudioListener.volume = 0;
-            PlayerPrefs.SetInt(volume, 0);
+            PlayerPrefs.SetFloat(volume, 0);
         }
         PlayerPrefs.Save();
+    }
+
+    public void UpdateVolume(float volumeU)
+    {
+        musicVolume = volumeU;
     }
 }
